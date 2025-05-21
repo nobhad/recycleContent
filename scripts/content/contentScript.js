@@ -14,6 +14,26 @@
  *              messaging, and dynamic content interaction.
  */
 
+// Main contentScript function (if needed for future expansion)
+const contentScript = () => {
+    console.log("Content script loaded and running.");
+};
 
+/**
+ * Inspect the DOM and return recyclable content elements.
+ * @returns {string[]} Array of outerHTML strings of recyclable elements.
+ */
+function inspectContent() {
+    const recyclableElements = document.querySelectorAll('.recyclable');
+    return Array.from(recyclableElements).map(element => element.outerHTML);
+}
+
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "checkRecyclableContent") {
+        const recyclableContent = inspectContent();
+        sendResponse({ recyclableContent });
+    }
+});
 
 export default contentScript;

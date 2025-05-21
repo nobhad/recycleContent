@@ -13,5 +13,28 @@
  * @note        This file includes exported constant definitions used across modules.
  */
 
-
-export default Constants;
+/**
+ * @constant {object} Constants
+ * @property {string} STORAGE_KEY_SETTINGS - Key name for extension settings storage.
+ * @property {string} STORAGE_KEY_QUEUE - Key name for message queue storage.
+ * @property {string} EVENT_DOM_UPDATED - Event name dispatched on DOM changes.
+ * @property {number} MAX_RETRY_ATTEMPTS - Maximum retry attempts for message processing.
+ * @property {string} API_ENDPOINT - URL of backend API for content processing.
+ * @property {RegExp} EXCLUSION_PATTERN - Regex pattern to exclude certain messages.
+ */
+const Constants = {
+    STORAGE_KEY_SETTINGS: 'RecycleContentSettings',
+    STORAGE_KEY_QUEUE: 'RecycleContentMessageQueue',
+    
+    EVENT_DOM_UPDATED: 'RecycleContentDOMUpdated',
+  
+    MAX_RETRY_ATTEMPTS: 3,
+  
+    API_ENDPOINT: 'https://api.recyclecontent.example.com/process',
+  
+    // Matches any message containing keywords that should exclude it from processing.
+    EXCLUSION_PATTERN: /(spam|advertisement|unsubscribe|click here)/i,
+  };
+  
+  export default Constants;
+  
