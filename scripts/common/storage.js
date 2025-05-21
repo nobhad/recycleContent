@@ -13,6 +13,7 @@
  * @note        This file includes complete JSDoc annotations with:
  *              @function, @async, @param, and @returns tags.
  */
+import Constants from './constants.js';
 
 /**
  * Storage class provides a wrapper around browser storage APIs.
@@ -26,10 +27,10 @@ class Storage {
  * 
  * @async
  * @function
- * @param {string} key - The key to retrieve from storage.
+ * @param {string} [key=Constants.STORAGE_KEYS.EXCLUSION_LIST] - The key to retrieve from storage.
  * @returns {Promise<any>} The value associated with the key.
  */
-Storage.prototype.get = async function(key) {
+Storage.prototype.get = async function(key = Constants.STORAGE_KEYS.EXCLUSION_LIST) {
     const result = await browser.storage.local.get(key);
     return result[key];
 }
@@ -39,11 +40,11 @@ Storage.prototype.get = async function(key) {
  * 
  * @async
  * @function
- * @param {string} key - The key to set in storage.
+ * @param {string} [key=Constants.STORAGE_KEYS.EXCLUSION_LIST] - The key to set in storage.
  * @param {any} value - The value to associate with the key.
  * @returns {Promise<void>}
  */
-Storage.prototype.set = async function(key, value) {
+Storage.prototype.set = async function(key = Constants.STORAGE_KEYS.EXCLUSION_LIST, value) {
     const obj = {};
     obj[key] = value;
     await browser.storage.local.set(obj);
@@ -54,10 +55,10 @@ Storage.prototype.set = async function(key, value) {
  * 
  * @async
  * @function
- * @param {string} key - The key to remove from storage.
+ * @param {string} [key=Constants.STORAGE_KEYS.EXCLUSION_LIST] - The key to remove from storage.
  * @returns {Promise<void>}
  */
-Storage.prototype.remove = async function(key) {
+Storage.prototype.remove = async function(key = Constants.STORAGE_KEYS.EXCLUSION_LIST) {
     await browser.storage.local.remove(key);
 }
 

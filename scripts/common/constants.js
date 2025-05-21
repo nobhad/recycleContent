@@ -21,20 +21,25 @@
  * @property {number} MAX_RETRY_ATTEMPTS - Maximum retry attempts for message processing.
  * @property {string} API_ENDPOINT - URL of backend API for content processing.
  * @property {RegExp} EXCLUSION_PATTERN - Regex pattern to exclude certain messages.
+ * @property {string} STATUS_RECYCLING_ON - Display text for recycling active status.
+ * @property {string} STATUS_RECYCLING_OFF - Display text for recycling inactive status.
  */
 const Constants = {
-    STORAGE_KEY_SETTINGS: 'RecycleContentSettings',
-    STORAGE_KEY_QUEUE: 'RecycleContentMessageQueue',
-    
-    EVENT_DOM_UPDATED: 'RecycleContentDOMUpdated',
-  
-    MAX_RETRY_ATTEMPTS: 3,
-  
-    API_ENDPOINT: 'https://api.recyclecontent.example.com/process',
-  
-    // Matches any message containing keywords that should exclude it from processing.
-    EXCLUSION_PATTERN: /(spam|advertisement|unsubscribe|click here)/i,
-  };
-  
-  export default Constants;
-  
+  STORAGE_KEY_SETTINGS: 'RecycleContentSettings',
+  STORAGE_KEY_QUEUE: 'RecycleContentMessageQueue',
+
+  EVENT_DOM_UPDATED: 'RecycleContentDOMUpdated',
+
+  MAX_RETRY_ATTEMPTS: 3,
+
+  API_ENDPOINT: 'https://api.recyclecontent.example.com/process',
+
+  // Matches any message containing keywords that should exclude it from processing.
+  EXCLUSION_PATTERN: /(spam|advertisement|unsubscribe|click here)/i,
+
+  // Status display text constants used in UI
+  STATUS_RECYCLING_ON: 'Recycling: ON',
+  STATUS_RECYCLING_OFF: 'Recycling: OFF',
+};
+
+export default Constants;

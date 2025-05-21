@@ -14,13 +14,13 @@
  *              messaging, and dynamic content interaction.
  */
 
-// Main contentScript function (if needed for future expansion)
-const contentScript = () => {
-    console.log("Content script loaded and running.");
-};
+import './domObserver.js';
+import './interfaceManager.js';
+import './messageParser.js';
 
 /**
- * Inspect the DOM and return recyclable content elements.
+ * Inspect the DOM and retrieve recyclable content elements.
+ * 
  * @returns {string[]} Array of outerHTML strings of recyclable elements.
  */
 function inspectContent() {
@@ -28,12 +28,32 @@ function inspectContent() {
     return Array.from(recyclableElements).map(element => element.outerHTML);
 }
 
-// Listen for messages from the background script
+/**
+ * Message listener for commands from the background script.
+ * 
+ * @param {Object} request - Message object from the background script.
+ * @param {Object} sender - Sender of the message.
+ * @param {Function} sendResponse - Function to send response back.
+ * @returns {boolean|undefined} Returns true if response is async, otherwise undefined.
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "checkRecyclableContent") {
         const recyclableContent = inspectContent();
         sendResponse({ recyclableContent });
     }
+    return false; // synchronous response
 });
 
-export default contentScript;
+/**
+ * Initialize content script behaviors.
+ * Currently logs when the content script is loaded.
+ */
+function initialize() {
+    console.log("Content script loaded and running.");
+    // You can add additional startup code here if needed
+}
+
+// Run initialize immediately when this script loads
+initialize();
+
+export default initialize;

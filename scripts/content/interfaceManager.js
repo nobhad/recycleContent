@@ -15,92 +15,99 @@
  *              - update(data): void
  */
 
+import Logger from '../common/logger.js';
+
 /**
- * @class InterfaceManager
  * Manages the registration, rendering, and updating of UI components.
- *
- * @property {Object<string, Object>} components - Registry of UI components by name.
+ * 
+ * @class
  */
 class InterfaceManager {
-    constructor() {
-        /**
-         * Internal component registry.
-         * @type {Object<string, { render: Function, update?: Function }>}
-         */
-        this.components = {};
-    }
-
+  /**
+   * Creates an instance of InterfaceManager.
+   */
+  constructor() {
     /**
-     * Registers a new component with a unique name.
-     *
-     * @function
-     * @param {string} name - Unique identifier for the component.
-     * @param {Object} component - The component object with a render method and optionally an update method.
+     * Internal registry of UI components by their unique names.
+     * @type {Object<string, { render: function(): string, update?: function(*): void }>}
      */
-    registerComponent(name, component) {
-        if (this.components[name]) {
-            console.warn(`Component "${name}" is already registered.`);
-            return;
-        }
-        this.components[name] = component;
+    this.components = {};
+  }
+
+  /**
+   * Registers a new UI component under a unique name.
+   * 
+   * @param {string} name - Unique identifier for the component.
+   * @param {{ render: function(): string, update?: function(*): void }} component - The component object.
+   * @returns {void}
+   */
+  registerComponent(name, component) {
+    if (this.components[name]) {
+      Logger.warn(`Component "${name}" is already registered.`);
+      return;
+    }
+    this.components[name] = component;
+    Logger.debug(`Component "${name}" registered.`);
+  }
+
+  /**
+   * Renders a registered component inside a container element.
+   * 
+   * @param {string} name - The component name.
+   * @param {HTMLElement} container - The container element where the component will be rendered.
+   * @returns {void}
+   */
+  renderComponent(name, container) {
+    const component = this.components[name];
+    if (!component) {
+      Logger.error(`Component "${name}" is not registered.`);
+      return;
     }
 
-    /**
-     * Renders a registered component into the provided container.
-     *
-     * @function
-     * @param {string} name - The name of the registered component to render.
-     * @param {HTMLElement} container - The DOM element to render the component into.
-     */
-    renderComponent(name, container) {
-        const component = this.components[name];
-        if (!component) {
-            console.error(`Component "${name}" is not registered.`);
-            return;
-        }
+    if (typeof component.render === 'function') {
+      container.innerHTML = component.render();
+      Logger.debug(`Component "${name}" rendered.`);
+    } else {
+      Logger.error(`Component "${name}" does not have a render method.`);
+    }
+  }
 
-        if (typeof component.render === 'function') {
-            container.innerHTML = component.render();
-        } else {
-            console.error(`Component "${name}" does not have a render method.`);
-        }
+  /**
+   * Updates a registered component with provided data.
+   * 
+   * @param {string} name - The component name.
+   * @param {*} data - Data to pass to the component's update method.
+   * @returns {void}
+   */
+  updateComponent(name, data) {
+    const component = this.components[name];
+    if (!component) {
+      Logger.error(`Component "${name}" is not registered.`);
+      return;
     }
 
-    /**
-     * Updates a registered component with new data.
-     *
-     * @function
-     * @param {string} name - The name of the component to update.
-     * @param {*} data - Arbitrary data to pass to the component's update method.
-     */
-    updateComponent(name, data) {
-        const component = this.components[name];
-        if (!component) {
-            console.error(`Component "${name}" is not registered.`);
-            return;
-        }
-
-        if (typeof component.update === 'function') {
-            component.update(data);
-        } else {
-            console.error(`Component "${name}" does not have an update method.`);
-        }
+    if (typeof component.update === 'function') {
+      component.update(data);
+      Logger.debug(`Component "${name}" updated.`);
+    } else {
+      Logger.error(`Component "${name}" does not have an update method.`);
     }
+  }
 }
 
 // Example usage (can be removed in production)
 const interfaceManager = new InterfaceManager();
 
 const exampleComponent = {
-    render: () => `<div>Hello, World!</div>`,
-    update: (data) => console.log('Updating component with data:', data),
+  render: () => `<div>Hello, World!</div>`,
+  update: (data) => Logger.debug('Updating component with data:', data),
 };
 
 interfaceManager.registerComponent('example', exampleComponent);
 
 const container = document.getElementById('app');
 if (container) {
-    interfaceManager.renderComponent('example', container);
+  interfaceManager.renderComponent('example', container);
 }
 
 export default InterfaceManager;

@@ -12,6 +12,9 @@
  * @note        This file includes complete JSDoc annotations with:
  *              @function, @listener, and @event tags.
  */
+import './messageQueue.js';
+import './notificationManager.js';
+import MessageProcessor from '../services/messageProcessor.js';
 
 /**
  * @constant {string} ALARM_NAME - Name of the recurring alarm.
@@ -41,17 +44,23 @@ const Background = {
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             console.log('Message received:', message);
 
-            // Simple validation example
             if (!message || typeof message !== 'object') {
                 sendResponse({ status: 'error', error: 'Invalid message format' });
                 return false;
             }
 
-            // Respond immediately
-            sendResponse({ status: 'success' });
+            // Async handling scaffold
+            (async () => {
+                try {
+                    const result = await MessageProcessor.handle(message);
+                    sendResponse({ status: 'success', data: result });
+                } catch (err) {
+                    console.error('Message processing error:', err);
+                    sendResponse({ status: 'error', error: err.message });
+                }
+            })();
 
-            // Return true if you want to send an async response later
-            return false;
+            return true; // Keeps message channel open for async
         });
     },
 
@@ -71,8 +80,12 @@ const Background = {
  */
 chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === ALARM_NAME) {
-        console.log('RecycleContent alarm triggered');
-        // TODO: Perform periodic background tasks here
+        try {
+            console.log('RecycleContent alarm triggered');
+            // TODO: Perform periodic background tasks here
+        } catch (err) {
+            console.error('Error in alarm handler:', err);
+        }
     }
 });
 
@@ -89,9 +102,18 @@ chrome.runtime.onStartup.addListener(() => {
  * @event onInstalled
  * @description Handles the installation event of the extension.
  */
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
     console.info('RecycleContent extension installed');
-    // TODO: Initialization tasks like setting default options, initializing storage
+
+    if (details.reason === 'install') {
+        chrome.storage.sync.set({
+            exclusionList: [],
+            userOptions: {}
+        }, () => {
+            console.info('Initial storage set up complete');
+        });
+    }
+
     Background.init();
 });
 
@@ -101,8 +123,7 @@ chrome.runtime.onInstalled.addListener(() => {
  */
 chrome.runtime.onSuspend.addListener(() => {
     console.info('RecycleContent extension suspended');
-    // TODO: Perform cleanup tasks here (e.g., save state)
-    // Note: Not guaranteed to be called, so save state periodically elsewhere if needed.
+    // TODO: Perform cleanup tasks here
 });
 
 /**
@@ -121,8 +142,7 @@ chrome.runtime.onSuspendCanceled.addListener(() => {
  */
 chrome.runtime.onUpdateAvailable.addListener((details) => {
     console.info('Update available:', details);
-    // TODO: Notify users about the update, or perform auto-update preparations
-    // Example: chrome.notifications.create({...});
+    // TODO: Notify users about the update or prepare for auto-reload
 });
 
 /**
@@ -131,24 +151,20 @@ chrome.runtime.onUpdateAvailable.addListener((details) => {
  */
 chrome.runtime.onRestartRequired.addListener(() => {
     console.warn('Restart required for update');
-    // TODO: Notify users or handle restart logic
-    // Example: chrome.runtime.reload();
+    // TODO: Notify users or reload
 });
 
 /**
  * @event onBrowserActionClicked
  * @description Handles the browser action button click event.
  */
-chrome.browserAction.onClicked.addListener(() => {
+chrome.action.onClicked.addListener(() => {
     console.info('Browser action button clicked');
-    // Recommended action: open the extension's options page
     chrome.runtime.openOptionsPage();
-    // Alternative: open a specific tab or popup if needed
 });
 
 /**
- * Initialize the background module immediately on load,
- * in case extension was loaded/reloaded without triggering onStartup/onInstalled.
+ * Initialize the background module immediately on load.
  */
 Background.init();
 
