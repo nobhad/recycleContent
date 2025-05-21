@@ -1,6 +1,8 @@
 /**
  * @file        constants.js
- * @description This module defines constants for the RecycleContent extension.
+ * @description Defines static values used throughout the RecycleContent extension.
+ *              Centralizes configuration flags, key names, and other shared literals
+ *              to improve consistency and maintainability.
  * 
  * @author      Noelle B.
  * @created     2025-05-21
@@ -8,8 +10,5 @@
  * 
  * @module      Constants
  * 
- * This module is part of the RecycleContent browser extension.
- * It provides functionality to retrieve, update, and store exclusion lists
- * for specific message IDs, optimizing performance with in-memory caching
- * and compressed storage.
+ * @note        This file includes exported constant definitions used across modules.
  */

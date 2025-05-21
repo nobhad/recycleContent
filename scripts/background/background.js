@@ -1,15 +1,14 @@
 /**
  * @file        background.js
- * @description This module manages the background processes for the RecycleContent extension.
- * 
+ * @description Manages background processes for the RecycleContent extension.
+ *              Handles event listeners, alarms, and communication between internal modules.
+ *
  * @author      Noelle B.
  * @created     2025-05-21
  * @license     MIT
- * 
+ *
  * @module      Background
  * 
- * This module is part of the RecycleContent browser extension.
- * It provides functionality to retrieve, update, and store exclusion lists
- * for specific message IDs, optimizing performance with in-memory caching
- * and compressed storage.
+ * @note        This file includes complete JSDoc annotations with:
+ *              @function, @listener, and @event tags.
  */

@@ -1,6 +1,8 @@
 /**
  * @file        popup.js
- * @description This module handles the popup functionality for the RecycleContent extension.
+ * @description Controls the behavior and rendering of the extension's popup UI,
+ *              allowing users to interact with RecycleContent settings, status,
+ *              and controls in a lightweight overlay.
  * 
  * @author      Noelle B.
  * @created     2025-05-21
@@ -8,8 +10,5 @@
  * 
  * @module      Popup
  * 
- * This module is part of the RecycleContent browser extension.
- * It provides functionality to retrieve, update, and store exclusion lists
- * for specific message IDs, optimizing performance with in-memory caching
- * and compressed storage.
+ * @note        Connects to background scripts and storage for dynamic state display.
  */

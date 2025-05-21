@@ -1,6 +1,8 @@
 /**
  * @file        logger.js
- * @description This module handles logging for the RecycleContent extension.
+ * @description Provides a lightweight logging utility for the RecycleContent extension.
+ *              Supports different log levels and scoped debug output for development
+ *              and debugging purposes.
  * 
  * @author      Noelle B.
  * @created     2025-05-21
@@ -8,8 +10,6 @@
  * 
  * @module      Logger
  * 
- * This module is part of the RecycleContent browser extension.
- * It provides functionality to retrieve, update, and store exclusion lists
- * for specific message IDs, optimizing performance with in-memory caching
- * and compressed storage.
+ * @note        This file includes complete JSDoc annotations for logging functions,
+ *              including @function and @param tags.
  */

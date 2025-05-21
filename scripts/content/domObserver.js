@@ -1,15 +1,15 @@
 /**
  * @file        domObserver.js
- * @description This module observes DOM changes for the RecycleContent extension.
+ * @description Observes changes in the DOM and triggers updates in the RecycleContent extension.
+ *              Useful for detecting dynamic content and running handlers when new elements
+ *              appear or disappear.
  * 
  * @author      Noelle B.
  * @created     2025-05-21
  * @license     MIT
  * 
- * @module     DOMObserver
+ * @module      DOMObserver
  * 
- * This module is part of the RecycleContent browser extension.
- * It provides functionality to retrieve, update, and store exclusion lists
- * for specific message IDs, optimizing performance with in-memory caching
- * and compressed storage.
+ * @note        This file includes complete JSDoc annotations with:
+ *              @class, @function, @param, and @returns tags.
  */

@@ -1,6 +1,8 @@
 /**
  * @file        components.js
- * @description This module handles the components for the RecycleContent extension.
+ * @description Defines reusable UI components for the RecycleContent extension,
+ *              such as buttons, dialogs, and content containers used in the popup
+ *              or injected interfaces.
  * 
  * @author      Noelle B.
  * @created     2025-05-21
@@ -8,8 +10,5 @@
  * 
  * @module      Components
  * 
- * This module is part of the RecycleContent browser extension.
- * It provides functionality to retrieve, update, and store exclusion lists
- * for specific message IDs, optimizing performance with in-memory caching
- * and compressed storage.
+ * @note        Designed for modular use in content scripts and the popup interface.
  */

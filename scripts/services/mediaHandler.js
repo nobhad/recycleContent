@@ -1,6 +1,8 @@
 /**
  * @file        mediaHandler.js
- * @description This module handles media-related functionalities for the RecycleContent extension.
+ * @description Manages media elements such as images, videos, and attachments
+ *              within messages processed by the RecycleContent extension.
+ *              Handles source extraction, media validation, and fallback behavior.
  * 
  * @author      Noelle B.
  * @created     2025-05-21
@@ -8,8 +10,5 @@
  * 
  * @module      MediaHandler
  * 
- * This module is part of the RecycleContent browser extension.
- * It provides functionality to retrieve, update, and store exclusion lists
- * for specific message IDs, optimizing performance with in-memory caching
- * and compressed storage.
+ * @note        Ensures proper handling of embedded and external media content.
  */
