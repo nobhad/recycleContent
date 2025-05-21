@@ -12,3 +12,6 @@
  * 
  * @note        This is the main logic hub for evaluating recyclable content.
  */
+
+
+export default MessageProcessor;

@@ -13,3 +13,7 @@
  * @note        This file includes complete JSDoc annotations for injected behaviors,
  *              messaging, and dynamic content interaction.
  */
+
+
+
+export default contentScript;

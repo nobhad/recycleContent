@@ -13,3 +13,5 @@
  * @note        This file includes complete JSDoc annotations for logging functions,
  *              including @function and @param tags.
  */
+
+export default Logger;

@@ -13,3 +13,6 @@
  * @note        This file includes complete JSDoc annotations with:
  *              @function, @async, @param, and @returns tags.
  */
+
+
+export default Storage;

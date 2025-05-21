@@ -12,3 +12,6 @@
  * 
  * @note        Designed for modular use in content scripts and the popup interface.
  */
+
+
+export default Components;

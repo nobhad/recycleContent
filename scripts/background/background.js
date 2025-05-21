@@ -12,3 +12,7 @@
  * @note        This file includes complete JSDoc annotations with:
  *              @function, @listener, and @event tags.
  */
+
+
+
+export default Background;

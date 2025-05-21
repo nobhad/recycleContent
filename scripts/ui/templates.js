@@ -11,3 +11,7 @@
  * 
  * @note        Templates support substitution tokens and content customization.
  */
+
+import { Template } from "ejs";
+
+export default Templates;

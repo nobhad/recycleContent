@@ -12,3 +12,6 @@
  * @note        This file includes complete JSDoc annotations with:
  *              @class, @function, @param, and @returns tags.
  */
+
+
+export default MessageQueue;

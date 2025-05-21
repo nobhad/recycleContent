@@ -12,3 +12,6 @@
  * 
  * @note        Connects to background scripts and storage for dynamic state display.
  */
+
+
+export default Popup;
