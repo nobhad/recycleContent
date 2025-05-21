@@ -1,7 +1,7 @@
 # RecycleContent
 
 ## Description  
-RecycleContent is a Chrome extension designed exclusively for OnlyFans creators to help recycle mass message content without resending it to subscribers who already purchased it. It intelligently automates message reuse while managing subscriber exclusion lists and preserving all original media assets, giving creators complete control over content recycling workflow.
+RecycleContent is a Chrome extension designed exclusively for OnlyFans creators to help recycle mass message content without resending duplicate content to subscribers who have already purchased it. It intelligently automates message reuse while managing subscriber exclusion lists and preserving all original media assets, giving creators complete control over content recycling workflow.
 
 ---
 
@@ -11,12 +11,12 @@ RecycleContent is a Chrome extension designed exclusively for OnlyFans creators 
 - [Installation](#installation)  
 - [Permissions](#permissions)  
 - [Usage](#usage)  
-- [Architecture & Best Practices](#architecture--best-practices)
-  - [Managing Exclusion Lists Efficiently](#managing-exclusion-lists-efficiently)
-  - [Safely Re-inserting Images and Videos](#safely-re-inserting-images-and-videos)
-  - [DOM Targeting Strategies for OnlyFans Interface](#dom-targeting-strategies-for-onlyfans-interface)
-  - [Performance Optimization](#performance-optimization)
-  - [Security Considerations](#security-considerations)
+- [Architecture & Best Practices](#architecture--best-practices)  
+  - [Managing Exclusion Lists Efficiently](#managing-exclusion-lists-efficiently)  
+  - [Safely Re-inserting Images and Videos](#safely-re-inserting-images-and-videos)  
+  - [DOM Targeting Strategies for OnlyFans Interface](#dom-targeting-strategies-for-onlyfans-interface)  
+  - [Performance Optimization](#performance-optimization)  
+  - [Security Considerations](#security-considerations)  
 - [Directory Structure](#directory-structure)  
 - [Contributing](#contributing)  
 - [License](#license)  
@@ -25,66 +25,83 @@ RecycleContent is a Chrome extension designed exclusively for OnlyFans creators 
 
 ---
 
-## Features  
-- **Content Recycling**: Resend previously sent mass messages with all original images, videos, text, and pricing intact
-- **Smart Exclusion Management**: Automatically build and maintain local exclusion lists of subscribers who already purchased the content
-- **Creator-controlled Timing**: Full manual control of send timing with no auto-scheduling
-- **Seamless Integration**: UI integrated via Chrome extension popup with scripts injected directly into the OnlyFans creator dashboard
-- **Modular Architecture**: Well-structured JavaScript architecture including content scripts, background scripts, and UI logic
-- **Reliable Performance**: Optimized for performance with local caching and efficient DOM manipulation
-- **Comprehensive Testing**: Full test suite and documentation included
+# Features
+
+- **Content Recycling**  
+  Effortlessly resend previously sent mass messages including all original text, images, videos, and pricing, preserving content integrity.
+
+- **Smart Exclusion Lists**  
+  Automatically generate and maintain subscriber exclusion lists locally to prevent sending duplicate content to subscribers who already purchased it.
+
+- **Manual Control Over Sending**  
+  Provides creators full manual control to review, edit, and send recycled messages without auto-scheduling, ensuring flexibility and precision.
+
+- **Seamless OnlyFans Integration**  
+  Injects scripts directly into the OnlyFans creator dashboard for a smooth and native user experience.
+
+- **Modular, Maintainable Codebase**  
+  Utilizes a modular architecture separating content scripts, background scripts, and UI logic for easier maintenance and extension.
+
+- **Optimized Performance**  
+  Local caching, efficient DOM manipulation, and background processing ensure responsive and smooth operation even with large subscriber lists.
+
+- **Comprehensive Testing**  
+  Includes unit, integration, and end-to-end tests to ensure reliability and stability.
+
+- **Robust Media Handling**  
+  Preserves all original media assets with fallback handling and lazy loading to maintain message quality and load times.
 
 ---
 
-## Installation  
-1. Load the extension in Chrome:  
-   1. Open `chrome://extensions`  
-   2. Enable **Developer mode** (toggle in the top-right corner)  
-   3. Click **Load unpacked** and select the project directory  
-2. Pin the extension to your toolbar for easy access
-3. Navigate to your OnlyFans creator dashboard to begin using the extension
+# Installation  
+
+1. Open `chrome://extensions` in Chrome.  
+2. Enable **Developer mode** in the top-right corner.  
+3. Click **Load unpacked** and select the project directory.  
+4. Pin the extension to your toolbar for easy access.  
+5. Navigate to your OnlyFans creator dashboard to start using the extension.
 
 ---
 
-## Permissions  
-The extension requires these Chrome permissions:  
-- `storage` - For managing exclusion lists and cached content data
-- `activeTab` - To inject scripts into the OnlyFans creator dashboard
-- `background` - For background data processing and state management
+# Permissions
+
+This extension requires the following Chrome permissions:
+
+- `storage` — Save and manage exclusion lists, message caches, and user preferences locally.  
+- `activeTab` — Inject scripts only into the active OnlyFans tab.  
+- `scripting` — Programmatically inject and execute scripts on OnlyFans pages (Manifest V3 requirement).  
+- `notifications` (optional) — Show user feedback for success or errors.
+
+> **Note:** Permissions are minimal and focused on extension functionality while respecting user privacy.
 
 ---
 
-## Usage  
-1. Navigate to your mass messages section on the OnlyFans creator dashboard
-2. Click the **Recycle** button next to any previously sent mass message
-3. The extension automatically:
-   - Fetches and preloads the original message content (text, media, pricing)
-   - Retrieves or creates an exclusion list based on original buyers
-   - Presents a confirmation dialog with options
-4. Customize your recycling options:
-   - Review and edit message content if needed
-   - Choose whether to maintain original pricing
-   - Confirm or modify the exclusion list
-5. Click **Prepare Message** to set up the recycled content
-6. Send immediately or save as a draft based on your preference
-7. The message will only be sent to eligible subscribers (those not on the exclusion list)
+# Usage
+
+1. Navigate to your OnlyFans creator dashboard in Chrome.  
+2. Click the **RecycleContent** extension icon.  
+3. Browse your previously sent mass messages.  
+4. Click **Recycle** on a message to resend.  
+5. The extension fetches the original content and exclusion list.  
+6. Review/edit the recycled message, text, media, pricing, and exclusion list.  
+7. Click **Prepare Message** to finalize.  
+8. Choose to **Send Immediately** or **Schedule for Later** (if supported).
 
 ---
 
 ## Architecture & Best Practices  
 
 ### Managing Exclusion Lists Efficiently  
-- **Indexed Storage**: Utilize Chrome's `storage.local` API with indexed subscriber IDs for O(1) lookup performance
-- **Compressed List Format**: Store exclusion lists as compressed binary data to reduce storage footprint and improve load times
-- **Incremental Updates**: Implement differential updates that only add new buyers to existing lists
-- **List Versioning**: Keep versioned history of exclusion lists with metadata for easy rollback and comparison
-- **Background Synchronization**: Process large lists in background service worker to avoid UI thread blocking
-- **Deduplication Pipeline**: Automatically clean and deduplicate lists on creation and update
-- **Smart Caching**: Cache frequently used lists in memory for instant access during active sessions
 
-**Implementation Example**:
+- Indexed storage with `chrome.storage.local` for O(1) lookups.  
+- Compressed formats to reduce size and load time.  
+- Incremental updates and versioning for reliability.  
+- Background synchronization to avoid UI blocking.  
+- Deduplication and smart caching for performance.
+
+**Example snippet:**
+
 ```javascript
-// exclusionList.js
 class ExclusionListManager {
   constructor() {
     this.cache = new Map();
@@ -92,41 +109,29 @@ class ExclusionListManager {
   }
 
   async getOrCreateList(messageId) {
-    // Try cache first for instant access
     if (this.cache.has(messageId)) {
       return this.cache.get(messageId);
     }
-    
-    // Check storage
     const key = `exclusion_${messageId}`;
     const result = await this.storage.get(key);
-    
     if (result[key]) {
-      // Decompress and parse the list
       const list = this.decompressList(result[key]);
-      // Cache the result
       this.cache.set(messageId, list);
       return list;
     }
-    
-    // Create new list if not found
     return this.createNewList(messageId);
   }
-  
+
   async updateList(messageId, newBuyers) {
     const list = await this.getOrCreateList(messageId);
     const updated = this.mergeAndDeduplicate(list, newBuyers);
-    
-    // Compress for storage efficiency
     const compressed = this.compressList(updated);
-    
-    // Update storage and cache
     await this.storage.set({[`exclusion_${messageId}`]: compressed});
     this.cache.set(messageId, updated);
-    
     return updated;
   }
 }
+
 ```
 
 ### Safely Re-inserting Images and Videos  
