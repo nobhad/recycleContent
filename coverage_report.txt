@@ -1,0 +1,395 @@
+noellebhaduri@Mac recyclecontent % npx jest --coverage
+ FAIL  tests/unit/background.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+    console.error
+      [RecycleContent][ERROR] Chrome alarms API is not available.
+
+      132 |       alarmListenerRegistered = true;
+      133 |     } else {
+    > 134 |       console.error('[RecycleContent][ERROR] Chrome alarms API is not available.');
+          |               ^
+      135 |     }
+      136 |   },
+      137 | };
+
+      at Object.error [as setupAlarmListener] (scripts/background/background.js:134:15)
+      at Object.setupAlarmListener [as init] (scripts/background/background.js:56:10)
+      at Object.init (scripts/background/background.js:140:12)
+      at Object.require (tests/unit/background.test.js:210:32)
+
+  ● Background Service Worker Unit Tests › init() registers runtime.onMessage listener only once
+
+    expect(jest.fn()).toHaveBeenCalledTimes(expected)
+
+    Expected number of calls: 1
+    Received number of calls: 0
+
+      61 |     background.init();
+      62 |
+    > 63 |     expect(chrome.runtime.onMessage.addListener).toHaveBeenCalledTimes(1);
+         |                                                  ^
+      64 |
+      65 |     // Calling init again should not add more listeners
+      66 |     background.init();
+
+      at Object.toHaveBeenCalledTimes (tests/unit/background.test.js:63:50)
+
+  ● Background Service Worker Unit Tests › handles runtime message successfully (async)
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      71 |   test('handles runtime message successfully (async)', async () => {
+      72 |     const message = { type: 'test' };
+    > 73 |     MessageProcessor.handle.mockResolvedValue('processed');
+         |                             ^
+      74 |
+      75 |     const sendResponse = await simulateOnMessage(message);
+      76 |
+
+      at mockResolvedValue (tests/unit/background.test.js:73:29)
+      at call (tests/unit/background.test.js:2:1)
+      at Generator.s (tests/unit/background.test.js:2:1)
+      at Generator._invoke [as next] (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at _next (tests/unit/background.test.js:2:1)
+      at Object.<anonymous> (tests/unit/background.test.js:2:1)
+
+  ● Background Service Worker Unit Tests › handles error during message processing
+
+    TypeError: Cannot read properties of undefined (reading 'mockRejectedValue')
+
+      81 |   test('handles error during message processing', async () => {
+      82 |     const message = { type: 'test' };
+    > 83 |     MessageProcessor.handle.mockRejectedValue(new Error('processing failed'));
+         |                             ^
+      84 |
+      85 |     const sendResponse = await simulateOnMessage(message);
+      86 |
+
+      at mockRejectedValue (tests/unit/background.test.js:83:29)
+      at call (tests/unit/background.test.js:2:1)
+      at Generator.s (tests/unit/background.test.js:2:1)
+      at Generator._invoke [as next] (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at _next (tests/unit/background.test.js:2:1)
+      at Object.<anonymous> (tests/unit/background.test.js:2:1)
+
+  ● Background Service Worker Unit Tests › responds with error for invalid message format
+
+    Please export onMessageHandler function from your background script for testing
+
+      34 | async function simulateOnMessage(message) {
+      35 |   if (!background.onMessageHandler) {
+    > 36 |     throw new Error(
+         |           ^
+      37 |       'Please export onMessageHandler function from your background script for testing'
+      38 |     );
+      39 |   }
+
+      at _callee4$ (tests/unit/background.test.js:36:11)
+      at call (tests/unit/background.test.js:2:1)
+      at Generator.s (tests/unit/background.test.js:2:1)
+      at Generator._invoke [as next] (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at _next (tests/unit/background.test.js:2:1)
+      at tests/unit/background.test.js:2:1
+      at apply (tests/unit/background.test.js:53:2)
+      at apply (tests/unit/background.test.js:34:33)
+      at simulateOnMessage (tests/unit/background.test.js:97:32)
+      at call (tests/unit/background.test.js:2:1)
+      at Generator.s (tests/unit/background.test.js:2:1)
+      at Generator._invoke [as next] (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at asyncGeneratorStep (tests/unit/background.test.js:2:1)
+      at _next (tests/unit/background.test.js:2:1)
+      at Object.<anonymous> (tests/unit/background.test.js:2:1)
+
+  ● Background Service Worker Unit Tests › registers alarm listener and triggers correct log
+
+    expect(jest.fn()).toHaveBeenCalled()
+
+    Expected number of calls: >= 1
+    Received number of calls:    0
+
+      106 |     background.setupAlarmListener();
+      107 |
+    > 108 |     expect(chrome.alarms.onAlarm.addListener).toHaveBeenCalled();
+          |                                               ^
+      109 |   });
+      110 |
+      111 |   test('creates alarm correctly', () => {
+
+      at Object.toHaveBeenCalled (tests/unit/background.test.js:108:47)
+
+  ● Background Service Worker Unit Tests › creates alarm correctly
+
+    TypeError: background.createAlarm is not a function
+
+      110 |
+      111 |   test('creates alarm correctly', () => {
+    > 112 |     background.createAlarm('testAlarm', 5);
+          |                ^
+      113 |
+      114 |     expect(chrome.alarms.create).toHaveBeenCalledWith('testAlarm', {
+      115 |       delayInMinutes: 5,
+
+      at Object.createAlarm (tests/unit/background.test.js:112:16)
+
+  ● Background Service Worker Unit Tests › runtime.onInstalled sets initial storage on install
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      119 |   test('runtime.onInstalled sets initial storage on install', () => {
+      120 |     // Grab the callback registered for onInstalled
+    > 121 |     const callback = chrome.runtime.onInstalled.addListener.mock.calls[0][0];
+          |                                                                          ^
+      122 |
+      123 |     const details = { reason: 'install' };
+      124 |     const setMock = jest.fn();
+
+      at Object.<anonymous> (tests/unit/background.test.js:121:74)
+
+  ● Background Service Worker Unit Tests › runtime.onStartup logs info and calls init
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      134 |     background.init = jest.fn();
+      135 |
+    > 136 |     const callback = chrome.runtime.onStartup.addListener.mock.calls[0][0];
+          |                                                                        ^
+      137 |     callback();
+      138 |
+      139 |     expect(logSpy).toHaveBeenCalledWith(
+
+      at Object.<anonymous> (tests/unit/background.test.js:136:72)
+
+  ● Background Service Worker Unit Tests › runtime.action.onClicked opens options page
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      149 |     background.openOptionsPage = openOptionsSpy;
+      150 |
+    > 151 |     const callback = chrome.runtime.action.onClicked.addListener.mock.calls[0][0];
+          |                                                                               ^
+      152 |     callback();
+      153 |
+      154 |     expect(openOptionsSpy).toHaveBeenCalled();
+
+      at Object.<anonymous> (tests/unit/background.test.js:151:79)
+
+  ● Background Service Worker Unit Tests › runtime.onSuspend and onSuspendCanceled log info
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      158 |     const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+      159 |
+    > 160 |     const onSuspendCb = chrome.runtime.onSuspend.addListener.mock.calls[0][0];
+          |                                                                           ^
+      161 |     const onSuspendCanceledCb = chrome.runtime.onSuspendCanceled.addListener.mock.calls[0][0];
+      162 |
+      163 |     onSuspendCb();
+
+      at Object.<anonymous> (tests/unit/background.test.js:160:75)
+
+  ● Background Service Worker Unit Tests › runtime.onUpdateAvailable logs info
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      177 |     const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+      178 |
+    > 179 |     const cb = chrome.runtime.onUpdateAvailable.addListener.mock.calls[0][0];
+          |                                                                          ^
+      180 |     cb();
+      181 |
+      182 |     expect(infoSpy).toHaveBeenCalledWith(
+
+      at Object.<anonymous> (tests/unit/background.test.js:179:74)
+
+  ● Background Service Worker Unit Tests › runtime.onRestartRequired logs warning
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      190 |     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      191 |
+    > 192 |     const cb = chrome.runtime.onRestartRequired.addListener.mock.calls[0][0];
+          |                                                                          ^
+      193 |     cb();
+      194 |
+      195 |     expect(warnSpy).toHaveBeenCalledWith(
+
+      at Object.<anonymous> (tests/unit/background.test.js:192:74)
+
+ PASS  tests/unit/messageHandler.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/mediaHandler.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/storage.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/uiComponents.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/integration/messageProcessor.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/messageProcessor.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/notificationManager.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/integration/contentScript.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/exclusionList.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/messageParser.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+    console.warn
+      [RecycleContent][WARN] MessageParser.normalize received non-string input
+
+      67 |   function warn(...args) {
+      68 |     if (currentLevel >= LEVELS.WARN) {
+    > 69 |       console.warn('[RecycleContent][WARN]', ...args);
+         |                   ^
+      70 |     }
+      71 |   }
+      72 |
+
+      at Object.apply [as warn] (scripts/common/logger.js:69:19)
+      at MessageParser.warn [as normalize] (scripts/content/messageParser.js:58:14)
+      at Object.normalize (tests/unit/messageParser.test.js:25:19)
+
+ PASS  tests/unit/constants.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/messageQueue.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/logger.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/e2e/workflow.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+ PASS  tests/unit/templates.test.js
+  ● Console
+
+    console.log
+      ✅ Jest setup loaded
+
+      at Object.<anonymous> (jest.setup.js:14:9)
+
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   85.01 |    75.82 |   86.79 |   85.13 |                   
+ background        |   69.71 |    64.28 |    64.7 |   70.58 |                   
+  background.js    |   51.72 |    64.28 |   33.33 |    50.9 | ...13-114,123-128 
+  messageQueue.js  |   74.13 |     62.5 |   84.61 |   76.36 | ...63-166,170-174 
+  ...ionManager.js |     100 |      100 |     100 |     100 |                   
+ common            |     100 |    80.64 |     100 |     100 |                   
+  constants.js     |     100 |      100 |     100 |     100 |                   
+  logger.js        |     100 |       75 |     100 |     100 | 62-74             
+  storage.js       |     100 |    84.21 |     100 |     100 | 30-56             
+ content           |     100 |      100 |     100 |     100 |                   
+  messageParser.js |     100 |      100 |     100 |     100 |                   
+ services          |   89.51 |    77.27 |   92.85 |   89.34 |                   
+  exclusionList.js |   92.45 |    83.33 |     100 |    92.3 | 29,45-46,109      
+  mediaHandler.js  |   83.33 |    66.66 |   85.71 |   83.33 | 140-153,191-198   
+  ...ageHandler.js |     100 |      100 |     100 |     100 |                   
+  ...eProcessor.js |   94.73 |    73.33 |     100 |   94.44 | 33                
+ ui                |   94.87 |    88.88 |     100 |   94.28 |                   
+  components.js    |   93.93 |     90.9 |     100 |    93.1 | 68,92             
+  templates.js     |     100 |       80 |     100 |     100 | 40                
+-------------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 1 failed, 15 passed, 16 total
+Tests:       12 failed, 133 passed, 145 total
+Snapshots:   0 total
+Time:        0.766 s, estimated 1 s
+Ran all test suites.
+noellebhaduri@Mac recyclecontent % 

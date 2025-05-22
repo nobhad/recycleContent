@@ -28,18 +28,22 @@ const Constants = {
   STORAGE_KEY_SETTINGS: 'RecycleContentSettings',
   STORAGE_KEY_QUEUE: 'RecycleContentMessageQueue',
 
+  STORAGE_KEYS: {
+    EXCLUSION_LIST: 'RecycleContentExclusionList',
+    // Add other keys here if needed
+  },
+
   EVENT_DOM_UPDATED: 'RecycleContentDOMUpdated',
 
   MAX_RETRY_ATTEMPTS: 3,
 
   API_ENDPOINT: 'https://api.recyclecontent.example.com/process',
 
-  // Matches any message containing keywords that should exclude it from processing.
   EXCLUSION_PATTERN: /(spam|advertisement|unsubscribe|click here)/i,
 
-  // Status display text constants used in UI
   STATUS_RECYCLING_ON: 'Recycling: ON',
   STATUS_RECYCLING_OFF: 'Recycling: OFF',
 };
+
 
 export default Constants;

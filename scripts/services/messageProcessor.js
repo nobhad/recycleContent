@@ -1,204 +1,95 @@
 /**
- * @file        mediaHandler.js
- * @description Manages media elements such as images, videos, and attachments
- *              within messages processed by the RecycleContent extension.
- *              Handles source extraction, media validation, and fallback behavior.
+ * @file        messageProcessor.js
+ * @description Coordinates the end-to-end processing of messages by combining
+ *              parsing, filtering, exclusion checking, and media analysis in
+ *              the RecycleContent extension.
  * 
  * @author      Noelle B.
  * @created     2025-05-21
  * @license     MIT
  * 
- * @module      MediaHandler
- * 
- * @note        Ensures proper handling of embedded and external media content.
+ * @module      MessageProcessor
  */
 
 import Constants from '../common/constants.js';
 import Logger from '../common/logger.js';
-import Storage from '../common/storage.js'; // if stores media preferences or cache
+import Storage from '../common/storage.js';
+import ExclusionList from './exclusionList.js';
 
 /**
- * Main class handling extraction, validation, and insertion of media
- * elements within messages.
- * 
- * @class
+ * Main class that handles full lifecycle processing of messages:
+ * parsing, filtering, exclusion, and media content analysis.
  */
-class MediaHandler {
-  constructor() {
-    /**
-     * Cache for media elements keyed by message ID.
-     * @type {Map<string, Array<Object>>}
-     */
-    this.mediaCache = new Map();
-  }
-
+class MessageProcessor {
   /**
-   * Extract media elements from a message by ID, caching results.
-   * 
-   * @async
-   * @param {string} messageId - Unique identifier for the message.
-   * @returns {Promise<Array<Object>>} Array of media element descriptors.
+   * @param {Object} options
+   * @param {MessageParser} options.parser - Instance of the MessageParser to use.
+   * @param {Function} [options.filterFunc] - Optional filter function to apply on parsed tokens.
+   * @param {Function} [options.exclusionChecker] - Optional function to check for exclusions.
+   * @param {Function} [options.mediaAnalyzer] - Optional async/sync function to analyze media content.
    */
-  async extractMediaFromMessage(messageId) {
-    const message = await this.fetchOriginalMessage(messageId);
-    const mediaElements = this.parseMediaElements(message);
-    this.mediaCache.set(messageId, mediaElements);
-    return mediaElements;
-  }
-
-  /**
-   * Retrieve cached media elements or extract if not cached.
-   * 
-   * @async
-   * @param {string} messageId - Unique identifier for the message.
-   * @returns {Promise<Array<Object>>}
-   */
-  async getMediaElements(messageId) {
-    if (this.mediaCache.has(messageId)) {
-      return this.mediaCache.get(messageId);
+  constructor({ parser, filterFunc, exclusionChecker, mediaAnalyzer } = {}) {
+    if (!parser || typeof parser.parse !== 'function') {
+      throw new Error('A valid parser with a .parse() method is required.');
     }
-    return this.extractMediaFromMessage(messageId);
+
+    this.parser = parser;
+    this.filterFunc = filterFunc;
+    this.exclusionChecker = exclusionChecker;
+    this.mediaAnalyzer = mediaAnalyzer;
   }
 
   /**
-   * Insert media elements into the given container element.
+   * Processes a single message: parses, filters, checks exclusions, analyzes media.
    * 
-   * @async
-   * @param {string} messageId - Unique message ID.
-   * @param {HTMLElement} targetContainer - DOM container for media.
-   * @returns {Promise<Array<Object>>} Results of insertion attempts.
+   * @param {string} message - Raw message text.
+   * @returns {Promise<Object>} Processed result object.
    */
-  async insertMediaIntoNewMessage(messageId, targetContainer) {
-    const mediaElements = await this.getMediaElements(messageId);
-    const insertionTasks = mediaElements.map(media => this.createInsertionTask(media, targetContainer));
-    return this.processInsertionQueue(insertionTasks);
-  }
+  async process(message) {
+    if (typeof message !== 'string') {
+      throw new TypeError('message must be a string');
+    }
 
-  /**
-   * Create insertion task for a single media element.
-   * 
-   * @async
-   * @param {Object} media - Media descriptor (type, src, alt, etc).
-   * @param {HTMLElement} targetContainer - DOM container element.
-   * @returns {Object} Task with async insert method.
-   */
-  async createInsertionTask(media, targetContainer) {
+    // Step 1: Parse
+    let tokens = this.parser.parse(message);
+
+    // Step 2: Filter (if applicable)
+    if (this.filterFunc) {
+      tokens = tokens.filter(this.filterFunc);
+    }
+
+    // Step 3: Exclusion check
+    const excluded = this.exclusionChecker ? this.exclusionChecker(message, tokens) : false;
+
+    // Step 4: Media analysis
+    const mediaAnalysis = this.mediaAnalyzer
+      ? await this.mediaAnalyzer(message)
+      : null;
+
+    // Optional debug logging
+    Logger.debug?.('Processed message:', { tokens, excluded, mediaAnalysis });
+
     return {
-      media,
-      insert: async () => {
-        try {
-          await this.validateMediaAvailability(media);
-          const element = this.createMediaElement(media);
-          this.insertWithProperFormatting(element, targetContainer);
-          return { success: true, element };
-        } catch (error) {
-          Logger.error(`Media insertion failed: ${error.message}`);
-          return { success: false, error, fallback: this.generateFallback(media) };
-        }
-      }
+      tokens,
+      excluded,
+      mediaAnalysis,
     };
   }
 
   /**
-   * Fetch original message content by message ID.
-   * Placeholder method — implement per your backend.
+   * Utility to process multiple messages in parallel.
    * 
-   * @async
-   * @param {string} messageId
-   * @returns {Promise<string>}
+   * @param {string[]} messages - Array of raw message strings.
+   * @param {MessageProcessor} processor - An instance of MessageProcessor.
+   * @returns {Promise<Object[]>} Array of result objects.
    */
-  async fetchOriginalMessage(messageId) {
-    return Promise.resolve('<message>Sample media content</message>');
-  }
-
-  /**
-   * Parse media elements from raw message content.
-   * 
-   * @param {string} messageContent
-   * @returns {Array<Object>} Media elements descriptors.
-   */
-  parseMediaElements(messageContent) {
-    // Example parser — replace with real parsing logic.
-    return [{ type: 'image', src: 'https://example.com/image.jpg', alt: 'Example' }];
-  }
-
-  /**
-   * Validate media availability and accessibility.
-   * 
-   * @async
-   * @param {Object} media
-   * @throws {Error} if media is invalid or unavailable.
-   */
-  async validateMediaAvailability(media) {
-    if (!media.src) throw new Error('Missing media source URL');
-    return Promise.resolve();
-  }
-
-  /**
-   * Create DOM element representing the media.
-   * 
-   * @param {Object} media
-   * @returns {HTMLElement}
-   */
-  createMediaElement(media) {
-    let element;
-    switch (media.type) {
-      case 'image':
-        element = document.createElement('img');
-        element.src = media.src;
-        element.alt = media.alt || '';
-        break;
-      case 'video':
-        element = document.createElement('video');
-        element.src = media.src;
-        element.controls = true;
-        break;
-      default:
-        element = document.createElement('span');
-        element.textContent = '[Unsupported media]';
+  static async processBatch(messages, processor) {
+    if (!Array.isArray(messages)) {
+      throw new TypeError('messages must be an array of strings');
     }
-    return element;
-  }
 
-  /**
-   * Insert element into container with styling and handlers.
-   * 
-   * @param {HTMLElement} element
-   * @param {HTMLElement} targetContainer
-   */
-  insertWithProperFormatting(element, targetContainer) {
-    element.classList.add('recycle-media');
-    targetContainer.appendChild(element);
-  }
-
-  /**
-   * Process insertion tasks sequentially.
-   * 
-   * @async
-   * @param {Array<Object>} insertionTasks
-   * @returns {Promise<Array<Object>>}
-   */
-  async processInsertionQueue(insertionTasks) {
-    const results = [];
-    for (const task of insertionTasks) {
-      const result = await task.insert();
-      results.push(result);
-    }
-    return results;
-  }
-
-  /**
-   * Generate fallback element for media that failed.
-   * 
-   * @param {Object} media
-   * @returns {HTMLElement}
-   */
-  generateFallback(media) {
-    const fallback = document.createElement('div');
-    fallback.classList.add('media-fallback');
-    fallback.textContent = `[Media unavailable: ${media.type}]`;
-    return fallback;
+    return Promise.all(messages.map(msg => processor.process(msg)));
   }
 }
 
-export default MediaHandler;
+export default MessageProcessor;

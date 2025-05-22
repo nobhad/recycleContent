@@ -1,18 +1,14 @@
 /**
  * @file        exclusionList.js
  * @description Manages exclusion lists for message IDs in the RecycleContent extension.
- *              Handles retrieval, update, and persistent storage with in-memory caching
- *              and serialized storage for performance optimization.
- *              Includes logging of important events and error handling.
+ *              Provides in-memory caching and persistent storage with serialization.
+ *              Logs key operations and handles errors gracefully.
  *
  * @author      Noelle B.
  * @created     2025-05-21
  * @license     MIT
  *
  * @module      ExclusionListManager
- *
- * @note        This file includes complete JSDoc annotations with:
- *              @class, @function, @param, and @returns tags.
  */
 
 import Constants from '../common/constants.js';
@@ -20,38 +16,24 @@ import Logger from '../common/logger.js';
 
 /**
  * @class ExclusionListManager
- * Handles exclusion list retrieval, creation, updating, and persistent storage,
- * with in-memory caching and serialized storage. Logs key operations and errors.
- *
- * @property {Map<string, Array<string>>} cache - In-memory cache of exclusion lists.
- * @property {chrome.storage.StorageArea | undefined} storage - Reference to Chrome's local storage.
+ * @classdesc Manages retrieval, creation, update, and caching of exclusion lists.
  */
 class ExclusionListManager {
   constructor() {
-    /**
-     * In-memory cache mapping message IDs to exclusion lists.
-     * @type {Map<string, Array<string>>}
-     */
+    /** @type {Map<string, Array<string>>} */
     this.cache = new Map();
 
-    /**
-     * Chrome local storage reference, or undefined if unavailable.
-     * @type {chrome.storage.StorageArea|undefined}
-     */
-    this.storage = chrome?.storage?.local;
+    /** @type {chrome.storage.StorageArea | undefined} */
+    this.storage = typeof chrome !== 'undefined' && chrome.storage?.local;
     if (!this.storage) {
       Logger.error('Chrome storage.local is not available.');
     }
   }
 
   /**
-   * Retrieves the exclusion list for a given message ID from cache or storage.
-   * Creates a new empty list if none exists.
-   *
-   * @async
-   * @function
-   * @param {string} messageId - The message ID associated with the exclusion list.
-   * @returns {Promise<Array<string>>} The list of excluded buyer IDs.
+   * Get or create an exclusion list for a given message ID.
+   * @param {string} messageId - ID to retrieve or initialize.
+   * @returns {Promise<Array<string>>}
    */
   async getOrCreateList(messageId) {
     if (this.cache.has(messageId)) {
@@ -66,7 +48,7 @@ class ExclusionListManager {
 
     const key = `exclusion_${messageId}`;
     try {
-      const result = await this.storage.get(key);
+      const result = await this.storage.get([key]);
       if (result[key]) {
         const list = this.deserializeList(result[key]);
         this.cache.set(messageId, list);
@@ -81,21 +63,17 @@ class ExclusionListManager {
   }
 
   /**
-   * Updates the exclusion list for a given message ID with new buyers,
-   * merges and deduplicates entries, persists the updated list,
-   * and updates the cache.
-   *
-   * @async
-   * @function
-   * @param {string} messageId - The message ID associated with the exclusion list.
-   * @param {Array<string>} newBuyers - List of new buyer IDs to exclude.
-   * @returns {Promise<Array<string>>} The updated exclusion list.
+   * Add new buyer IDs to the exclusion list for a message ID.
+   * @param {string} messageId
+   * @param {Array<string>} newBuyers
+   * @returns {Promise<Array<string>>}
    */
   async updateList(messageId, newBuyers) {
     if (!Array.isArray(newBuyers)) {
       Logger.warn('updateList called with non-array newBuyers');
       newBuyers = [];
     }
+
     const list = await this.getOrCreateList(messageId);
     const updated = this.mergeAndDeduplicate(list, newBuyers);
     const serialized = this.serializeList(updated);
@@ -114,14 +92,10 @@ class ExclusionListManager {
   }
 
   /**
-   * Creates a new, empty exclusion list, stores it persistently,
-   * and caches it.
-   *
+   * Initialize and persist a new empty exclusion list.
    * @private
-   * @async
-   * @function
-   * @param {string} messageId - The message ID to associate with the new list.
-   * @returns {Promise<Array<string>>} The newly created exclusion list.
+   * @param {string} messageId
+   * @returns {Promise<Array<string>>}
    */
   async createNewList(messageId) {
     const list = [];
@@ -141,13 +115,10 @@ class ExclusionListManager {
   }
 
   /**
-   * Deserializes a stored exclusion list from JSON string.
-   * If parsing fails or data is not an array, returns empty list.
-   *
+   * Deserialize stored exclusion list from JSON.
    * @private
-   * @function
-   * @param {string} data - Serialized exclusion list as a JSON string.
-   * @returns {Array<string>} Deserialized exclusion list.
+   * @param {string} data
+   * @returns {Array<string>}
    */
   deserializeList(data) {
     try {
@@ -162,29 +133,28 @@ class ExclusionListManager {
   }
 
   /**
-   * Serializes the exclusion list to a JSON string for storage.
-   *
+   * Serialize exclusion list to JSON string.
    * @private
-   * @function
-   * @param {Array<string>} list - Exclusion list to serialize.
-   * @returns {string} Serialized exclusion list.
+   * @param {Array<string>} list
+   * @returns {string}
    */
   serializeList(list) {
     return JSON.stringify(list);
   }
 
   /**
-   * Merges two lists of buyer IDs, deduplicating any duplicates.
-   *
+   * Merge two lists, removing duplicates.
    * @private
-   * @function
-   * @param {Array<string>} existingList - The existing exclusion list.
-   * @param {Array<string>} newList - New buyer IDs to add.
-   * @returns {Array<string>} Merged and deduplicated list.
+   * @param {Array<string>} existingList
+   * @param {Array<string>} newList
+   * @returns {Array<string>}
    */
   mergeAndDeduplicate(existingList, newList) {
     return Array.from(new Set([...existingList, ...newList]));
   }
 }
 
-export default ExclusionListManager;
+/** @type {ExclusionListManager} Singleton instance for managing exclusion lists. */
+const exclusionListManager = new ExclusionListManager();
+
+export default exclusionListManager;

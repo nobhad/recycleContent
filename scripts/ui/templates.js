@@ -11,6 +11,7 @@
  * 
  * @note        Templates support substitution tokens and content customization.
  */
+
 import Constants from '../common/constants.js'; // if templates use constants for IDs or classes
 
 /**
@@ -28,6 +29,12 @@ class Templates {
    * 
    * @param {boolean} useConstantId - Whether to use constant for ID.
    * @returns {string} HTML string for a button.
+   * 
+   * @example
+   * const html = Templates.fillTemplate(
+   *   Templates.getButtonTemplate(), 
+   *   { label: 'Submit', id: 'submitBtn' }
+   * );
    */
   static getButtonTemplate(useConstantId = false) {
     const id = useConstantId ? Constants.STORAGE_KEY_SETTINGS : '{{id}}';
@@ -39,6 +46,12 @@ class Templates {
    * Supports tokens like {{title}} and {{content}}.
    * 
    * @returns {string} HTML string for a dialog container.
+   * 
+   * @example
+   * const dialogHtml = Templates.fillTemplate(
+   *   Templates.getDialogTemplate(),
+   *   { title: 'Warning', content: 'Are you sure?' }
+   * );
    */
   static getDialogTemplate() {
     return `
@@ -56,6 +69,12 @@ class Templates {
    * Token: {{message}}
    * 
    * @returns {string} Text string for status messages.
+   * 
+   * @example
+   * const statusMsg = Templates.fillTemplate(
+   *   Templates.getStatusMessageTemplate(),
+   *   { message: 'Loading complete.' }
+   * );
    */
   static getStatusMessageTemplate() {
     return `Status: {{message}}`;
@@ -63,10 +82,19 @@ class Templates {
 
   /**
    * Performs token substitution on a template string.
+   * Replaces tokens of the form {{token}} with corresponding values.
+   * If a token is missing in data, it is left unchanged.
    * 
    * @param {string} template - Template string containing tokens like {{token}}.
    * @param {Object<string, string>} data - Key-value pairs for substitution.
    * @returns {string} The template with tokens replaced by corresponding values.
+   * 
+   * @example
+   * const result = Templates.fillTemplate(
+   *   '<p>Hello, {{name}}!</p>', 
+   *   { name: 'Noelle' }
+   * );
+   * // result: '<p>Hello, Noelle!</p>'
    */
   static fillTemplate(template, data) {
     return template.replace(/{{(\w+)}}/g, (match, token) => {
